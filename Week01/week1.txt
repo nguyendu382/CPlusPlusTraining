@@ -1,0 +1,27 @@
+📘 Week 1 – C++11 Practice Exercises
+1. Variables, Data Types, and Operators
+1.1.	Write a program to calculate the sum, difference, product, and quotient of two integers entered from the keyboard.
+1.2.	Write a program to check whether an integer is even or odd.
+1.3.	Write a program to compute the average score of 3 subjects and classify the performance (e.g., Excellent, Good, Average, Weak).
+________________________________________
+2. Control Structures and Loops
+2.1.	Write a program to print the multiplication tables from 1 to 10.
+2.2.	Write a program to compute the sum of even numbers from 1 to n (where n is input by the user).
+2.3.	Write a program to check whether a number is a prime number.
+________________________________________
+3. Functions and Pass by Value / Reference
+3.1.	Write a function int max(int a, int b) that returns the greater of two numbers.
+3.2.	Write a function void swap(int& a, int& b) to swap the values of two integers.
+3.3.	Write a program that uses a function unsigned long long factorial(int n) to compute the factorial of a number.
+________________________________________
+4. C++11 Features: auto, nullptr, enum class, range-based for
+4.1.	Create a vector<int> with 10 elements, and use auto with a range-based for loop to print its contents.
+4.2.	Define an enum class Gender { Male, Female, Other }; and write a function to convert enum values to strings and print them.
+4.3.	Declare a pointer int* ptr = nullptr and check if ptr == nullptr, then print a message.
+________________________________________
+5. Smart Pointers (unique_ptr, shared_ptr)
+5.1.	Create a unique_ptr<int> pointing to an integer and print its value.
+5.2.	Define a Student class with name and age attributes. Manage instances using shared_ptr.
+5.3.	Write a function that returns a unique_ptr<Student> and use std::move to transfer ownership.
+
+
