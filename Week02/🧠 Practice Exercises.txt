@@ -1,0 +1,65 @@
+🧠 Practice Exercises
+🔹 1. Student Class
+Requirements:
+Create a class Student with:
+
+std::string name
+
+int age
+
+double gpa
+
+Constructor, getter/setter methods
+
+A method void printInfo() to display student details
+
+Use a std::vector<std::shared_ptr<Student>> to manage a list of students
+
+Implement a function to:
+
+Add students to the list
+
+Print all students
+
+Calculate average GPA
+
+Bonus: Add static member to count total number of Student objects.
+
+🔹 2. Rectangle Class
+Requirements:
+Create a class Rectangle with:
+
+double width, height
+
+Constructor with default parameters
+
+Methods:
+
+double area() const
+
+double perimeter() const
+
+void resize(double scale)
+
+Overload << operator to print rectangle info
+
+Bonus: Use unique_ptr<Rectangle> to manage a rectangle object in main.
+
+🔹 3. BankAccount Class
+Requirements:
+Class BankAccount with:
+
+std::string accountNumber
+
+double balance
+
+Constructor + deposit(double), withdraw(double), printStatement()
+
+Use private encapsulation
+
+Add a friend function transfer(BankAccount& from, BankAccount& to, double amount)
+
+Use this pointer in member functions
+
+Bonus: Store multiple BankAccount objects in a std::vector<std::unique_ptr<BankAccount>>.
+
