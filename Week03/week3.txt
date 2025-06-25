@@ -1,0 +1,58 @@
+🧠 Practice Exercises
+🔹 1. Zoo Animal Management
+Requirements:
+Create abstract base class Animal with:
+
+virtual void speak() const = 0 (pure virtual)
+
+A virtual destructor (each animal say goodbye based on its type)
+
+Derived classes:
+
+Lion, Elephant, Monkey, each overriding speak()
+
+Store a list of std::shared_ptr<Animal>
+
+Iterate and call speak() using base class pointer → demonstrate runtime polymorphism.
+
+✅ Bonus: Add a feed() function to show base class function call chaining.
+
+🔹 2. Vehicle Management System
+Requirements:
+Base class: Vehicle
+
+std::string brand, int year
+
+virtual void displayInfo() const = 0
+
+Derived classes:
+
+Car: adds numberOfDoors
+
+Truck: adds maxLoad
+
+Demonstrate:
+
+Inheritance & overriding displayInfo()
+
+Accessing via std::vector<std::unique_ptr<Vehicle>>
+
+Use override keyword
+
+✅ Bonus: Add a Garage class that has a list of vehicles (composition).
+
+🔹 3. Polymorphism with Base Class Pointer
+Instructions:
+Create base class Shape with:
+
+virtual double area() const = 0
+
+Derived:
+
+Circle, Rectangle, Triangle
+
+In main():
+
+Store std::vector<std::shared_ptr<Shape>>
+
+Call area() in loop to calculate total area
