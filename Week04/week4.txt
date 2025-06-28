@@ -1,0 +1,82 @@
+Week 4 Practice Assignment: Advanced Templates & Modern C++
+1. Template Function – Find Maximum Element
+Goal:
+Write a function template findMax that returns the maximum element in an array (or vector) of any comparable type.
+
+Requirements:
+The function should take a const std::vector<T>& as input
+It should return std::optional<T>
+If the container is empty → return std::nullopt
+Otherwise → return the largest element
+Use a range-based loop or STL algorithm
+
+Function Signature:
+template<typename T>
+std::optional<T> findMax(const std::vector<T>& data);
+Example Usage:
+std::vector<int> numbers = {3, 1, 7, 2};
+auto max = findMax(numbers);  // returns 7
+
+std::vector<std::string> names = {};
+auto maxName = findMax(names); // returns std::nullopt
+
+2. Template Class – Math Utilities
+Goal:
+Create a generic Math<T> class that supports basic arithmetic operations:
+
+add, subtract, multiply, divide
+
+The divide function must safely handle division by zero by returning a std::optional<T>
+
+Example:
+Math<int> calc;
+auto sum = calc.add(5, 3);        // 8
+auto result = calc.divide(10, 0); // std::nullopt
+
+3. Optional Configuration Loader
+Goal:
+
+Define a Config struct with the following fields:
+
+std::optional<std::string> appName
+
+std::optional<int> maxConnections
+
+Implement a function loadConfigFromFile() that returns a Config object
+
+You may simulate file loading (no actual file I/O needed)
+
+Some fields can be unset
+
+Implement a function to print the config. If a field is not set, print <not set>
+
+Example Output:
+App Name: MyServer
+Max Connections: <not set>
+
+4. Variant-Based Command Dispatcher
+Goal:
+
+Define a Command variant using std::variant with 3 structs:
+
+Start, Stop, Pause
+
+Implement a function dispatchCommand(const Command&) using std::visit
+
+Each command should print its action:
+
+"Starting...", "Stopping...", "Paused"
+
+Bonus:
+Use if constexpr inside the lambda to handle different command types.
+
+5. Fold Expression – Sum All Values
+Goal:
+
+Write a function template sumAll(...) using fold expressions
+
+It should accept any number of numeric arguments and return their sum
+
+Example:
+sumAll(1, 2, 3, 4);   // 10
+sumAll(2.5, 1.5);     // 4.0
