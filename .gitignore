@@ -1,0 +1,101 @@
+﻿# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rar
+*.zip
+*.pfx
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Dd]ebug64/
+[Rr]elease64/
+Unicode_Debug/
+Unicode_Release/
+x64/
+x86/
+[Bb]in/
+[Ll]ib/
+[Bb]uild/
+Samples/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+
+# Visual Studio 2017 auto generated files
+Generated\ Files/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio Trace Files
+*.e2e
+*.htm
+*.exp
+*.lib
+*.bsc
+*.dlog
+*.xml
+*.pl
+*.CopyComplete
+*.sarif
+*.cache
+*.enc
+
+*.exe
+*.dll
+*.res
+*.tlog
+*.idb
+/.aider*
+/.github
