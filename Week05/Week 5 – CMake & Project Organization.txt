@@ -1,0 +1,71 @@
+📚 Week 5 – CMake & Project Organization
+🔧 Goal: Use CMake to build a clean, modular C++ project with multiple folders and libraries (static/shared).
+
+✅ Exercise 1: Hello Modular Project
+🔹 Objective: Create a C++ project with three modules:
+
+app/ — the main program
+
+core/ — a static library (contains logic)
+
+utils/ — a shared library (contains helper functions)
+
+📂 Expected Folder Structure
+Week5Project/
+├── CMakeLists.txt             ← top-level
+├── app/
+│   ├── CMakeLists.txt
+│   └── main.cpp
+├── core/
+│   ├── CMakeLists.txt
+│   ├── core.h
+│   └── core.cpp
+├── utils/
+    ├── CMakeLists.txt
+    ├── utils.h
+    └── utils.cpp
+🛠️ Task Instructions
+Write Code
+
+core.cpp → has a function std::string get_app_name()
+
+utils.cpp → has a function void print_message(const std::string&)
+
+main.cpp → calls both functions
+
+Write CMakeLists.txt for each folder
+
+core/ builds as static library
+
+utils/ builds as shared library
+
+app/ builds as executable
+
+Link app with core and utils
+
+Configure and build
+
+Build in Release mode:
+cmake -S . -B build/ -DCMAKE_BUILD_TYPE=Release
+cmake --build build/
+
+Run the app
+
+🔎 Bonus Challenges
+✅ Use target_include_directories() properly with PRIVATE, PUBLIC, or INTERFACE
+
+✅ Rebuild project in Debug mode
+
+✅ Use file(GLOB ...) to automatically collect .cpp files
+
+✅ Package your project using install() commands
+
+✅ Deliverable Checklist
+ Project compiles successfully with CMake
+
+ Output prints message from both core and utils
+
+ Project folder is clean and modular
+
+ Build works in both Debug and Release mode
+
