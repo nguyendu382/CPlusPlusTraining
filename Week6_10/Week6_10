@@ -1,0 +1,95 @@
+Project: Smart Booking System
+“A complete simulation of booking and managing events, users, and ticketing with efficient algorithms and data structures.”
+# Functional Requirements:
+1. Event & Ticket Management
+Add/remove events (name, date, location, ticket count)
+
+Each event is stored in a map<int, Event> (or unordered_map)
+
+Each event contains a dynamic list of Ticket objects (using linked list or vector)
+
+2. User Booking
+Each User can:
+
+Book a ticket → insert into hash table
+
+Cancel a ticket → remove from hash table
+
+View booked tickets → traversal/sorting required
+
+3. Data Structures to Use
+Concept	Application
+Array	Ticket ID pool, event schedule list
+Linked List	User’s ticket list (dynamically growing/shrinking)
+Stack	Undo last operation (e.g., cancel last booking)
+Queue	Booking requests queue (optional challenge)
+Binary Tree / BST	Organize events by date or popularity
+Hash Table	Fast lookup of user bookings by username/email
+Graph	Events connected by distance → find shortest path (DFS/BFS)
+Sorting	Sort events by date or price (Bubble/Merge/Quick)
+
+# Example Class Design
+struct Ticket {
+    int id;
+    std::string userName;
+    double price;
+};
+
+class Event {
+public:
+    int eventId;
+    std::string name;
+    std::vector<Ticket> tickets;
+    std::set<int> bookedTicketIds; // no duplicate ticket booking
+    std::pair<int, int> location;
+
+    void sortTicketsByPrice(); // using QuickSort or MergeSort
+};
+
+class User {
+public:
+    std::string name;
+    std::list<Ticket> myTickets; // linked list for dynamic updates
+    std::stack<Ticket> undoStack; // for canceling recent booking
+};
+
+class BookingSystem {
+    std::unordered_map<std::string, User> userMap; // username → User
+    std::map<int, Event> eventMap; // eventId → Event
+    std::vector<std::vector<int>> eventGraph; // distance between events
+
+public:
+    void addEvent(...);
+    void bookTicket(...);
+    void cancelTicket(...);
+    void findPathBetweenEvents(int from, int to); // BFS/DFS
+    void showSortedEvents(); // sort by price/date
+};
+
+# Algorithms Should Apply:
+1. Bubble Sort	-> sorting of small ticket lists
+2. Merge/Quick Sort -> sorting large event lists 
+3. Binary Search -> Find event or ticket by ID efficiently
+4. DFS/BFS	Graph -> events connected by location
+5. Hash lookup ->	User booking lookup
+
+# Bonus Extensions
+1. Apply Dijkstra’s algorithm to find shortest route between event locations
+
+2. Cache recent bookings using std::deque
+Sample:
+class BookingCache {
+    std::deque<Booking> recentBookings;
+    size_t maxSize;
+
+public:
+    BookingCache(size_t size) : maxSize(size) {}
+
+    void addBooking(const Booking& b); // Add newest at the end
+
+    void showRecentBookings() const;
+
+    Booking getLastBooking() const;
+
+    void undoLastBooking();
+};

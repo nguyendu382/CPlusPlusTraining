@@ -4,10 +4,10 @@
 using namespace std;
 
 class BankAccount {
-	string accountNumber;
+	string& accountNumber;
 	double balance;
 public:
-	BankAccount(const string& accNum, double initialBalance) 
+	BankAccount(string& accNum, double initialBalance) 
 		: accountNumber(accNum), balance(initialBalance) {}
 	void deposit(double amount) {
 		if (amount > 0) {
@@ -42,9 +42,13 @@ public:
 
 int main() {
 	vector<unique_ptr<BankAccount>> accounts;
-	accounts.push_back(make_unique<BankAccount>("123", 100));
-	accounts.push_back(make_unique<BankAccount>("456", 200));
-	accounts.push_back(make_unique<BankAccount>("789", 300));
+	string accNum1 = "123";
+	accounts.push_back(make_unique<BankAccount>(accNum1, 100));
+	accounts.push_back(make_unique<BankAccount>(accNum1, 200));
+	accounts.push_back(make_unique<BankAccount>(accNum1, 300));
+
+	auto abc = std::make_unique<BankAccount>(accNum1, 400);
+	accounts.push_back(std::move(abc));
 	for (const auto& acc : accounts) {
 		acc->printStatement();
 	}
