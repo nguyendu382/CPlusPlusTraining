@@ -11,8 +11,8 @@ int main() {
 	auto product = calc.mul(a, b);
 	std::cout << "Product: " << product << std::endl;
 	auto quotient = calc.div(a, b);
-	if (quotient) {
-		std::cout << "Quotient: " << *quotient << std::endl;
+	if (quotient.has_value()) {
+		std::cout << "Quotient: " << quotient.value() << std::endl;
 	} else {
 		std::cout << "Division by zero is not allowed." << std::endl;
 	}
