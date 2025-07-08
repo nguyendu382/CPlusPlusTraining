@@ -1,17 +1,8 @@
 #include <iostream>
-#include <optional>
+#include "Config.h"
 
-struct Config {
-	std::optional<std::string> appName;
-	std::optional<int> maxConnections;
-};
-Config loadConfigFromFile() {
-	Config config;
-	config.appName = "MyServer";
-	return config;
-}
 void printConfig(const Config& config) {
-	if (config.appName) {
+	if (config.appName.has_value()) {
 		std::cout << "App Name: " << *config.appName << std::endl;
 	} else {
 		std::cout << "App Name: <Not set>" << std::endl;
