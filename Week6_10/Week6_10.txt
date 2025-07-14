@@ -28,6 +28,9 @@ Hash Table	Fast lookup of user bookings by username/email
 Graph	Events connected by distance → find shortest path (DFS/BFS)
 Sorting	Sort events by date or price (Bubble/Merge/Quick)
 
+4. Storage:
+- Read/Write from JSON file (using rapidjson)
+
 # Example Class Design
 struct Ticket {
     int id;
