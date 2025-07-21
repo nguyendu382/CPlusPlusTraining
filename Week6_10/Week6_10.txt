@@ -44,8 +44,6 @@ public:
     std::string name;
     std::vector<Ticket> tickets;
     std::set<int> bookedTicketIds; // no duplicate ticket booking
-    std::pair<int, int> location;
-
     void sortTicketsByPrice(); // using QuickSort or MergeSort
 };
 
@@ -65,7 +63,6 @@ public:
     void addEvent(...);
     void bookTicket(...);
     void cancelTicket(...);
-    void findPathBetweenEvents(int from, int to); // BFS/DFS
     void showSortedEvents(); // sort by price/date
 };
 
@@ -77,8 +74,6 @@ public:
 5. Hash lookup ->	User booking lookup
 
 # Bonus Extensions
-1. Apply Dijkstra’s algorithm to find shortest route between event locations
-
 2. Cache recent bookings using std::deque
 Sample:
 class BookingCache {
