@@ -5,7 +5,6 @@
 
 class BookingCache {
     std::deque<Ticket> recentBookings;
-    //std::deque<int>
     size_t maxSize;
 
 public:
@@ -15,15 +14,6 @@ public:
         if (recentBookings.size() >= maxSize)
             recentBookings.pop_front();
         recentBookings.push_back(b);
-    }
-
-    bool hasBooking() const {
-        return !recentBookings.empty();
-    }
-
-    Ticket getLastBooking() const {
-        if (!recentBookings.empty()) return recentBookings.back();
-        return Ticket();
     }
 
     void removeLastBooking() {
@@ -36,11 +26,12 @@ public:
             std::cout << "No recent bookings.\n";
             return;
         }
-        std::cout << "Recent bookings for this event:\n";
+
         for (const auto& b : recentBookings) {
-            std::cout << "Ticket ID: " << b.id
-                << " | User: " << b.userName
-                << " | Price: " << b.price << "\n";
+            std::cout << "Ticket ID: " << b.getId()
+                << " | User: " << b.getUserName()
+                << " | Event ID: " << b.getEventId()
+                << " | Price: " << b.getPrice() << "\n";
         }
     }
 };

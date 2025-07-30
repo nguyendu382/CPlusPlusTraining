@@ -3,14 +3,22 @@
 
 struct Ticket {
     int id;
-    std::string userName;
-    std::string eventName;
-    std::string eventDate;
-    // std::string eventID;
-    double price;
-    // bool status;
+	std::string userName;
+	int eventId;
+	double price;
+	bool status;
+	
+	Ticket(int i = 0, const std::string& u = "", int eId = 0, double p = 0.0, bool s = true)
+		: id(i), userName(u), eventId(eId), price(p), status(s) {}
 
-    Ticket() = default;
-    Ticket(int i, const std::string& u, const std::string& e, const std::string& d, double p)
-        : id(i), userName(u), eventName(e), eventDate(d), price(p) {}
+	int getId() const { return id; }
+	const std::string& getUserName() const { return userName; }
+	int getEventId() const { return eventId; }
+	double getPrice() const { return price; }
+	bool isValid() const { return status; }
+	void setId(int i) { id = i; }
+	void setUserName(const std::string& u) { userName = u; }
+	void setEventId(int eId) { eventId = eId; }
+	void setPrice(double p) { price = p; }
+	void setStatus(bool s) { status = s; }
 };

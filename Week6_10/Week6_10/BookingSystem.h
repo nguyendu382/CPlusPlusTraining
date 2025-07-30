@@ -1,222 +1,411 @@
 #pragma once
+#include <iostream>
 #include <unordered_map>
 #include <map>
+#include <vector>
+#include <string>
+#include <set>
+#include <algorithm> 
 #include "User.h"
 #include "Event.h"
+#include "Ticket.h"
+#include "BookingCache.h"
+#include <fstream>
 #include <rapidjson/document.h>
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 #include <rapidjson/prettywriter.h>
-#include <fstream>
 
 class BookingSystem {
-    //std::vector<Ticket> tickets;
-    std::unordered_map<std::string, User> userMap;
-    std::map<int, Event> eventMap;
+    std::vector<Ticket> tickets;
+    std::unordered_map<std::string, User> users;
+    std::map<int, Event> events;
+    std::set<int> eventIds;
+    std::map<int, BookingCache> bookingCaches;
     int nextTicketId = 1000;
 
-public:
-    ~BookingSystem() {
-        for (auto& pair : eventMap) {
-			saveEventToJson(pair.second,"event.json");
-        }
-    }
-    bool userExists(const std::string& userName) const {
-        return userMap.find(userName) != userMap.end();
+    static void sortTicketsByPrice(std::vector<Ticket>& ticketList) {
+        std::sort(ticketList.begin(), ticketList.end(),
+            [](const Ticket& a, const Ticket& b) {
+                return a.getPrice() > b.getPrice();
+            });
     }
 
-    void createUser(const std::string& userName, const std::string& email) {
-        userMap[userName] = User(userName, email);
+public:
+    bool userExists(const std::string& userName) const {
+        return users.count(userName);
+    }
+
+    void createUser(const std::string& userName, const std::string& name) {
+        User user;
+        user.setUserName(userName);
+        user.setName(name);
+        users[userName] = user;
     }
 
     void addEvent(int id, const std::string& name, const std::string& date, const std::string& loc) {
-        eventMap[id] = Event(id, name, date, loc);
-        std::cout << "Event added: " << name << "\n";
-    }
-
-    void removeEvent(int id) {
-        if (eventMap.erase(id)) {
-            std::cout << "Event removed.\n";
-        }
-        else {
-            std::cout << "Event not found.\n";
-        }
-    }
-
-    void showEvents() {
-        if (eventMap.empty()) {
-            std::cout << "No events available.\n";
+        if (eventIds.count(id)) {
+            std::cout << "Event ID already exists. Please use a unique ID.\n";
             return;
         }
-        for (auto it = eventMap.begin(); it != eventMap.end(); ++it) {
-            int id = it->first;
-            Event& ev = it->second;
-            std::cout << "[ID: " << id << "] " << ev.name << " - " << ev.date << " - " << ev.location << "\n";
+        Event e;
+        e.setEventId(id);
+        e.setEventName(name);
+        e.setDate(date);
+        e.setLocation(loc);
+        e.setStatus(true);
+        events[id] = e;
+        eventIds.insert(id);
+        bookingCaches[id] = BookingCache();
+        std::cout << "Event added successfully: " << name << std::endl;
+    }
+
+    void updateEvent(int id) {
+        if (!eventIds.count(id)) {
+            std::cout << "Event ID not found.\n";
+            return;
+        }
+
+        Event& e = events[id];
+
+        std::cout << "\n--- Current Event Information ---\n";
+        std::cout << "ID: " << e.getEventId()
+            << " | Name: " << e.getEventName()
+            << " | Date: " << e.getDate()
+            << " | Location: " << e.getLocation()
+            << " | Status: " << (e.isActive() ? "Active" : "Inactive") << "\n";
+
+        std::string newName, newDate, newLocation;
+
+        std::cout << "\n--- Enter New Information ---\n";
+        std::cout << "New Name: ";
+        std::cin >> newName;
+        std::cout << "New Date: ";
+        std::cin >> newDate;
+        std::cout << "New Location: ";
+        std::cin >> newLocation;
+
+        e.setEventName(newName);
+        e.setDate(newDate);
+        e.setLocation(newLocation);
+
+        std::cout << "Event updated successfully.\n";
+    }
+
+
+    void removeEvent(int id) {
+        auto it = events.find(id);
+        if (it == events.end()) {
+            std::cout << "Event not found.\n";
+            return;
+        }
+        it->second.setStatus(false);
+        for (auto& t : tickets) {
+            if (t.getEventId() == id && t.isValid()) {
+                t.setStatus(false);
+            }
+        }
+        std::cout << "Event and all related tickets have been deactivated.\n";
+    }
+
+    void activateEvent(int id) {
+        auto it = events.find(id);
+        if (it == events.end()) {
+            std::cout << "Event not found.\n";
+            return;
+        }
+        if (it->second.isActive()) {
+            std::cout << "Event is already active.\n";
+            return;
+        }
+        it->second.setStatus(true);
+        for (auto& t : tickets) {
+            if (t.getEventId() == id && !t.isValid()) {
+                t.setStatus(true);
+            }
+        }
+        std::cout << "Event and all related tickets have been activated.\n";
+    }
+
+    void bookTicket(const std::string& userName, int eventId, double price) {
+        if (!users.count(userName) || !eventIds.count(eventId)) {
+            std::cout << "User or Event not found.\n";
+            return;
+        }
+
+        Ticket t;
+        t.setId(nextTicketId++);
+        t.setUserName(userName);
+        t.setEventId(eventId);
+        t.setPrice(price);
+        t.setStatus(true);
+
+        tickets.push_back(t);
+        bookingCaches[eventId].addBooking(t);
+        std::cout << "Ticket booked successfully. ID: " << t.getId() << "\n";
+    }
+
+    void cancelTicket(const std::string& userName, int ticketId) {
+        for (auto& t : tickets) {
+            if (t.getId() == ticketId && t.getUserName() == userName && t.isValid()) {
+                t.setStatus(false);
+                std::cout << "Ticket canceled.\n";
+                return;
+            }
+        }
+        std::cout << "Ticket not found or already canceled.\n";
+    }
+
+    void undoLastBooking(const std::string& userName) {
+        for (auto it = tickets.rbegin(); it != tickets.rend(); ++it) {
+            if (it->getUserName() == userName && it->isValid()) {
+                std::cout << "Undo booking? Ticket ID: " << it->getId()
+                    << " | Event ID: " << it->getEventId()
+                    << " | Price: " << it->getPrice() << "\n";
+                std::cout << "Undo? (y/n): ";
+                char c;
+                std::cin >> c;
+                if (c == 'y') {
+                    it->setStatus(false);
+                    bookingCaches[it->getEventId()].removeLastBooking();
+                    std::cout << "Undo ticket ID: " << it->getId() << "\n";
+                }
+                return;
+            }
+        }
+        std::cout << "No booking to undo.\n";
+    }
+
+    void undoLastEventBooking(int eventId) {
+        if (!eventIds.count(eventId) || !bookingCaches.count(eventId)) {
+            std::cout << "Event not found.\n";
+            return;
+        }
+        for (auto it = tickets.rbegin(); it != tickets.rend(); ++it) {
+            if (it->getEventId() == eventId && it->isValid()) {
+                std::cout << "Undo booking? Ticket ID: " << it->getId()
+                    << " | User: " << it->getUserName()
+                    << " | Price: " << it->getPrice() << "\n";
+                std::cout << "Undo? (y/n): ";
+                char c;
+                std::cin >> c;
+                if (c == 'y') {
+                    it->setStatus(false);
+                    bookingCaches[eventId].removeLastBooking();
+                    std::cout << "Last booking removed.\n";
+                }
+                else std::cout << "Undo canceled.\n";
+                return;
+            }
+        }
+        std::cout << "No booking to undo for this event.\n";
+    }
+
+    void showUserTickets(const std::string& userName) {
+        int sum = 0;
+        for (const auto& t : tickets) {
+            if (t.getUserName() == userName) {
+                std::cout << "Ticket ID: " << t.getId()
+                    << " | Event ID: " << t.getEventId()
+                    << " | Price: " << t.getPrice()
+                    << " | Status: " << (t.isValid() ? "Valid" : "Cancelled") << "\n";
+                sum++;
+            }
+        }
+        if (sum == 0) {
+            std::cout << "No booking for this event.\n";
+        }
+        else {
+            std::cout << "Total tickets: " << sum << "\n";
         }
     }
 
     void showTicketsForEvent(int eventId) {
-        auto it = eventMap.find(eventId);
-        if (it == eventMap.end()) {
+        if (!eventIds.count(eventId) || !bookingCaches.count(eventId)) {
             std::cout << "Event not found.\n";
             return;
         }
-
-        it->second.printTicketsForEvent();
-    }
-
-    void showRecentBookingsForEvent(int eventId) const {
-        auto it = eventMap.find(eventId);
-        if (it == eventMap.end()) {
-            std::cout << "Event not found.\n";
-            return;
-        }
-
-        std::cout << "Recent bookings for event: " << it->second.name << "\n";
-        it->second.bookingCache.showRecentBookings();
-    }
-
-    void undoLastEventBooking(int eventId) {
-        auto it = eventMap.find(eventId);
-        if (it == eventMap.end()) {
-            std::cout << "Event not found.\n";
-            return;
-        }
-
-        Event& ev = it->second;
-        if (!ev.bookingCache.hasBooking()) {
-            std::cout << "No recent bookings to undo for this event.\n";
-            return;
-        }
-
-        Ticket last = ev.bookingCache.getLastBooking();
-        std::cout << "Last ticket booked for this event:\n";
-        std::cout << "Ticket ID: " << last.id
-            << " | User: " << last.userName
-            << " | Price: " << last.price << "\n";
-
-        std::cout << "Are you sure you want to remove this booking? (y/n): ";
-        char confirm;
-        std::cin >> confirm;
-
-        if (confirm == 'y') {
-            if (ev.undoLastBooking()) {
-                std::cout << "Last booking removed from event.\n";
-
-                if (userMap.count(last.userName)) {
-                    userMap[last.userName].cancelTicket(last.id);
-                }
-            }
-            else {
-                std::cout << "Undo failed.\n";
+        std::vector<Ticket> eventTickets;
+        for (const auto& t : tickets) {
+            if (t.getEventId() == eventId) {
+                eventTickets.push_back(t);
             }
         }
-        else {
-            std::cout << "Undo canceled.\n";
-        }
-    }
-
-
-    void bookTicket(const std::string& userName, int eventId, double price) {
-        if (eventMap.find(eventId) == eventMap.end()) {
-            std::cout << "Event not found.\n";
+        if (eventTickets.empty()) {
+            std::cout << "No booking for this event.\n";
             return;
         }
-        Ticket t(nextTicketId++, userName, eventMap[eventId].name, eventMap[eventId].date, price);
-
-        if (!eventMap[eventId].addTicket(t)) {
-            std::cout << "Ticket already booked.\n";
-            return;
+        sortTicketsByPrice(eventTickets);
+        int sum = 0;
+        for (const auto& t : eventTickets) {
+            std::cout << "Ticket ID: " << t.getId()
+                << " | User: " << t.getUserName()
+                << " | Price: " << t.getPrice()
+                << " | Status: " << (t.isValid() ? "Valid" : "Cancelled") << "\n";
+            sum++;
         }
-
-        userMap[userName].bookTicket(t);
-        std::cout << "Ticket booked successfully! ID: " << t.id << "\n";
+        std::cout << "Total tickets: " << sum << "\n";
     }
 
-
-    void cancelTicket(const std::string& userName, int ticketId) {
-        if (!userMap[userName].cancelTicket(ticketId)) {
-            std::cout << "Ticket not found.\n";
-            return;
+    void showEvents() {
+        int sum = 0;
+        for (const auto& eventPair : events) {
+            const int id = eventPair.first;
+            const Event& e = eventPair.second;
+            std::cout << "[ID: " << e.getEventId() << "] "
+                << e.getEventName() << " - " << e.getDate()
+                << " - " << e.getLocation() << " - "
+                << (e.isActive() ? "Active" : "Inactive") << "\n";
+            sum++;
         }
-        for (auto it = eventMap.begin(); it != eventMap.end(); ++it) {
-            int id = it->first;
-            Event& ev = it->second;
-            ev.removeTicket(ticketId);
-        }
-        std::cout << "Ticket canceled.\n";
+        std::cout << "Total events: " << sum << "\n";
     }
 
-    void undoLastBooking(const std::string& userName) {
-        User& user = userMap[userName];
-        if (user.undoStack.empty()) {
-            std::cout << "No booking to undo.\n";
-            return;
-        }
-
-        const Ticket& last = user.undoStack.top();
-        std::cout << "Last ticket booked:\n";
-        std::cout << "Ticket ID: " << last.id
-            << " | Event: " << last.eventName
-            << " | Date: " << last.eventDate
-            << " | Price: " << last.price << "\n";
-
-        std::cout << "Are you sure you want to undo this booking? (y/n): ";
-        char confirm;
-        std::cin >> confirm;
-
-        if (confirm == 'y') {
-            if (user.undoLastBooking()) {
-                std::cout << "Last booking undone.\n";
-                for (auto it = eventMap.begin(); it != eventMap.end(); ++it) {
-                    int id = it->first;
-                    Event& ev = it->second;
-                    ev.removeTicket(last.id);
-                }
-            }
-            else {
-                std::cout << "Undo failed.\n";
-            }
-        }
-        else {
-            std::cout << "Undo canceled.\n";
-        }
+    void showRecentBookingsForEvent(int eventId) {
+        if (eventIds.count(eventId) && bookingCaches.count(eventId))
+            bookingCaches[eventId].showRecentBookings();
+        else std::cout << "No recent bookings for this event.\n";
     }
 
-    void showUserTickets(const std::string& userName) {
-        userMap[userName].printTicketsForUser();
-    }
-
-    void saveEventToJson(const Event& event, const std::string& filename) {
+    void saveToJson(const std::string& filename) {
         rapidjson::Document doc;
         doc.SetObject();
-        rapidjson::Document::AllocatorType& allocator = doc.GetAllocator();
+        auto& allocator = doc.GetAllocator();
 
-        doc.AddMember("eventId", event.eventId, allocator);
-        doc.AddMember("name", rapidjson::Value(event.name.c_str(), allocator), allocator);
-        doc.AddMember("date", rapidjson::Value(event.date.c_str(), allocator), allocator);
-        doc.AddMember("location", rapidjson::Value(event.location.c_str(), allocator), allocator);
-
-        // Tickets array
-        rapidjson::Value ticketsArr(rapidjson::kArrayType);
-        for (const auto& ticket : event.tickets) {
-            rapidjson::Value ticketObj(rapidjson::kObjectType);
-            ticketObj.AddMember("id", ticket.id, allocator);
-            ticketObj.AddMember("userName", rapidjson::Value(ticket.userName.c_str(), allocator), allocator);
-            ticketObj.AddMember("eventName", rapidjson::Value(ticket.eventName.c_str(), allocator), allocator);
-            ticketObj.AddMember("eventDate", rapidjson::Value(ticket.eventDate.c_str(), allocator), allocator);
-            ticketObj.AddMember("price", ticket.price, allocator);
-            ticketsArr.PushBack(ticketObj, allocator);
+        // Save events
+        rapidjson::Value eventArr(rapidjson::kArrayType);
+        for (const auto& pair : events) {
+            const auto& e = pair.second;
+            rapidjson::Value eventObj(rapidjson::kObjectType);
+            eventObj.AddMember("eventId", e.getEventId(), allocator);
+            eventObj.AddMember("eventName", rapidjson::Value(e.getEventName().c_str(), allocator), allocator);
+            eventObj.AddMember("date", rapidjson::Value(e.getDate().c_str(), allocator), allocator);
+            eventObj.AddMember("location", rapidjson::Value(e.getLocation().c_str(), allocator), allocator);
+            eventObj.AddMember("status", e.isActive(), allocator);
+            eventArr.PushBack(eventObj, allocator);
         }
-        doc.AddMember("tickets", ticketsArr, allocator);
+        doc.AddMember("events", eventArr, allocator);
 
-        // Ghi ra file
+        // Save users
+        rapidjson::Value userArr(rapidjson::kArrayType);
+        for (const auto& pair : users) {
+            const auto& u = pair.second;
+            rapidjson::Value userObj(rapidjson::kObjectType);
+            userObj.AddMember("userName", rapidjson::Value(u.getUserName().c_str(), allocator), allocator);
+            userObj.AddMember("name", rapidjson::Value(u.getName().c_str(), allocator), allocator);
+            userArr.PushBack(userObj, allocator);
+        }
+        doc.AddMember("users", userArr, allocator);
+
+        // Save tickets
+        rapidjson::Value ticketArr(rapidjson::kArrayType);
+        for (const auto& t : tickets) {
+            rapidjson::Value ticketObj(rapidjson::kObjectType);
+            ticketObj.AddMember("id", t.getId(), allocator);
+            ticketObj.AddMember("userName", rapidjson::Value(t.getUserName().c_str(), allocator), allocator);
+            ticketObj.AddMember("eventId", t.getEventId(), allocator);
+            ticketObj.AddMember("price", t.getPrice(), allocator);
+            ticketObj.AddMember("status", t.isValid(), allocator);
+            ticketArr.PushBack(ticketObj, allocator);
+        }
+        doc.AddMember("tickets", ticketArr, allocator);
+
+        // Write to file
         rapidjson::StringBuffer buffer;
         rapidjson::PrettyWriter<rapidjson::StringBuffer> writer(buffer);
+
         doc.Accept(writer);
 
         std::ofstream ofs(filename);
-        ofs << buffer.GetString();
-        ofs.close();
+        if (ofs.is_open()) {
+            ofs << buffer.GetString();
+            ofs.close();
+            std::cout << "Saved to " << filename << " successfully.\n";
+        }
+        else {
+            std::cout << "Failed to open file " << filename << "\n";
+        }
+    }
+
+    void loadFromJson(const std::string& filename) {
+        std::ifstream ifs(filename);
+        if (!ifs.is_open()) {
+            std::cout << "Failed to open file " << filename << "\n";
+            return;
+        }
+
+        std::string jsonStr((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        ifs.close();
+
+        rapidjson::Document doc;
+        if (doc.Parse(jsonStr.c_str()).HasParseError()) {
+            std::cout << "Failed to parse JSON.\n";
+            return;
+        }
+
+        // Clear current data
+        tickets.clear();
+        users.clear();
+        events.clear();
+        eventIds.clear();
+        bookingCaches.clear();
+        nextTicketId = 1000;
+
+        // Load events
+        if (doc.HasMember("events") && doc["events"].IsArray()) {
+            for (const auto& eventObj : doc["events"].GetArray()) {
+                if (eventObj.HasMember("eventId") && eventObj.HasMember("eventName") &&
+                    eventObj.HasMember("date") && eventObj.HasMember("location") && eventObj.HasMember("status")) {
+                    int id = eventObj["eventId"].GetInt();
+                    Event e;
+                    e.setEventId(id);
+                    e.setEventName(eventObj["eventName"].GetString());
+                    e.setDate(eventObj["date"].GetString());
+                    e.setLocation(eventObj["location"].GetString());
+                    e.setStatus(eventObj["status"].GetBool());
+                    events[id] = e;
+                    eventIds.insert(id);
+                    bookingCaches[id] = BookingCache();
+                }
+            }
+        }
+
+        // Load users
+        if (doc.HasMember("users") && doc["users"].IsArray()) {
+            for (const auto& userObj : doc["users"].GetArray()) {
+                if (userObj.HasMember("userName") && userObj.HasMember("name")) {
+                    User u;
+                    u.setUserName(userObj["userName"].GetString());
+                    u.setName(userObj["name"].GetString());
+                    users[u.getUserName()] = u;
+                }
+            }
+        }
+
+        // Load tickets
+        int maxTicketId = nextTicketId;
+        if (doc.HasMember("tickets") && doc["tickets"].IsArray()) {
+            for (const auto& ticketObj : doc["tickets"].GetArray()) {
+                if (ticketObj.HasMember("id") && ticketObj.HasMember("userName") &&
+                    ticketObj.HasMember("eventId") && ticketObj.HasMember("price") && ticketObj.HasMember("status")) {
+                    Ticket t;
+                    t.setId(ticketObj["id"].GetInt());
+                    t.setUserName(ticketObj["userName"].GetString());
+                    t.setEventId(ticketObj["eventId"].GetInt());
+                    t.setPrice(ticketObj["price"].GetDouble());
+                    t.setStatus(ticketObj["status"].GetBool());
+                    tickets.push_back(t);
+                    if (bookingCaches.count(t.getEventId())) {
+                        bookingCaches[t.getEventId()].addBooking(t);
+                    }
+                    if (t.getId() >= maxTicketId) {
+                        maxTicketId = t.getId() + 1;
+                    }
+                }
+            }
+        }
+        nextTicketId = maxTicketId;
+
+        std::cout << "Loaded from " << filename << " successfully.\n";
     }
 };
