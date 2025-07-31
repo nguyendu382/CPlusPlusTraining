@@ -42,10 +42,11 @@ void showManagerMenu() {
 void choiceUserMenu(BookingSystem& system) {
     std::string currentUser, name;
     std::cout << "Enter your username: ";
-    std::cin >> currentUser;
+    std::cin.ignore();
+    std::getline(std::cin, currentUser);
     if (!system.userExists(currentUser)) {
         std::cout << "New user detected. Please enter your name: ";
-        std::cin >> name;
+        std::getline(std::cin, name);
         system.createUser(currentUser, name);
     }
     else {
@@ -54,8 +55,17 @@ void choiceUserMenu(BookingSystem& system) {
     std::cout << "\nWelcome " << currentUser << "!\n";
     while (true) {
         int userChoice;
+		int userChoiceInt;
         showUserMenu();
         std::cin >> userChoice;
+        std::cin.ignore();
+        try {
+			userChoiceInt = std::stoi(std::to_string(userChoice));
+            }
+        catch (const std::exception& e) {
+            std::cout << "Invalid input! Please enter a valid choice.\n";
+			continue;
+        }
         switch (userChoice) {
         case 1:
             system.showEvents();
@@ -64,12 +74,14 @@ void choiceUserMenu(BookingSystem& system) {
             int eid; double price;
             std::cout << "Enter event ID: "; std::cin >> eid;
             std::cout << "Enter ticket price: "; std::cin >> price;
+            std::cin.ignore();
             system.bookTicket(currentUser, eid, price);
             break;
         }
         case 3: {
             int tid;
             std::cout << "Enter ticket ID: "; std::cin >> tid;
+            std::cin.ignore();
             system.cancelTicket(currentUser, tid);
             break;
         }
@@ -89,15 +101,28 @@ void choiceUserMenu(BookingSystem& system) {
 
 void choiceManagerMenu(BookingSystem& system) {
     while (true) {
-        int managerChoice;
+        std::string managerChoice;
+        int managerChoiceInt;
         showManagerMenu();
         std::cin >> managerChoice;
-        switch (managerChoice) {
+        std::cin.ignore();
+        try {
+            managerChoiceInt = std::stoi(managerChoice);
+        }
+        catch (const std::exception& e) {
+            std::cout << "Invalid input! Please enter a valid manager ID.\n";
+            continue;
+        }
+        switch (managerChoiceInt) {
         case 1: {
-            int eid; std::string name, date, loc;
-            std::cout << "Enter ID, name, date, location: ";
-            std::cin >> eid >> name >> date >> loc;
-            system.addEvent(eid, name, date, loc);
+            std::string name, date, loc;
+            std::cout << "Enter name: ";
+            std::getline(std::cin, name);
+            std::cout << "Enter date (YYYY-MM-DD): ";
+            std::getline(std::cin, date);
+            std::cout << "Enter location: ";
+            std::getline(std::cin, loc);
+            system.addEvent(name, date, loc);
             break;
         }
         case 2: {
@@ -155,10 +180,18 @@ void choiceManagerMenu(BookingSystem& system) {
 
 void choiceMainMenu(BookingSystem& system) {
     while (true) {
-        int choice;
+        std::string choice;
         showMainMenu();
         std::cin >> choice;
-        switch (choice) {
+		int choiceInt;
+		try {
+			choiceInt = std::stoi(choice);
+		}
+		catch (const std::invalid_argument& e) {
+			std::cout << "Invalid input! Please enter a number.\n";
+			continue;
+		}
+        switch (choiceInt) {
         case 1:
             choiceUserMenu(system);
             break;

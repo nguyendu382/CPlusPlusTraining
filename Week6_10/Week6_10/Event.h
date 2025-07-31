@@ -1,13 +1,13 @@
 #pragma once
 #include <string>
 
-class Event {
+struct Event {
 	int eventId;
 	std::string eventName;
 	std::string date;
 	std::string location;
 	bool status;
-public:
+
 	Event(int id = 0, const std::string& name = "", const std::string& dateStr = "", const std::string& loc = "", bool stat = true)
 		: eventId(id), eventName(name), date(dateStr), location(loc), status(stat) {
 	}

@@ -17,11 +17,11 @@
 #include <rapidjson/prettywriter.h>
 
 class BookingSystem {
-    std::vector<Ticket> tickets;
-    std::unordered_map<std::string, User> users;
-    std::map<int, Event> events;
-    std::set<int> eventIds;
-    std::map<int, BookingCache> bookingCaches;
+    std::vector<Ticket> m_tickets;
+    std::unordered_map<std::string, User> m_users;
+    std::map<int, Event> m_events;
+    std::map<int, BookingCache> m_bookingCaches;
+    int nextEventId = 1;
     int nextTicketId = 1000;
 
     static void sortTicketsByPrice(std::vector<Ticket>& ticketList) {
@@ -36,7 +36,7 @@ public:
 
     void createUser(const std::string& userName, const std::string& name);
 
-    void addEvent(int id, const std::string& name, const std::string& date, const std::string& loc);
+    void addEvent(const std::string& name, const std::string& date, const std::string& loc);
 
     void updateEvent(int id);
 

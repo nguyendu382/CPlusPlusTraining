@@ -1,10 +1,10 @@
 #pragma once
 #include <string>
 
-class User {
+struct User {
 	std::string userName;
 	std::string name;
-public:
+
 	User(const std::string& u = "", const std::string& n = "")
 		: userName(u), name(n) {
 	}
