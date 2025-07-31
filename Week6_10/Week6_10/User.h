@@ -14,3 +14,4 @@ public:
 	void setUserName(const std::string& u) { userName = u; }
 	void setName(const std::string& n) { name = n; }
 };
+

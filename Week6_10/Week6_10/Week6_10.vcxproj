@@ -123,6 +123,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="BookingSystem.cpp" />
     <ClCompile Include="Week6_10.cpp" />
   </ItemGroup>
   <ItemGroup>
