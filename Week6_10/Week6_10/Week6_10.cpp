@@ -14,7 +14,6 @@ void showMainMenu() {
 }
 
 void showUserMenu() {
-
     std::cout << "\n--- User ---\n";
     std::cout << "1. View list of events\n";
     std::cout << "2. Book a ticket\n";
@@ -42,8 +41,7 @@ void showManagerMenu() {
 void choiceUserMenu(BookingSystem& system) {
     std::string currentUser, name;
     std::cout << "Enter your username: ";
-    std::cin.ignore();
-    std::getline(std::cin, currentUser);
+	std::cin >> currentUser;    
     if (!system.userExists(currentUser)) {
         std::cout << "New user detected. Please enter your name: ";
         std::getline(std::cin, name);
@@ -54,34 +52,31 @@ void choiceUserMenu(BookingSystem& system) {
     }
     std::cout << "\nWelcome " << currentUser << "!\n";
     while (true) {
-        int userChoice;
+        std::string userChoice;
 		int userChoiceInt;
         showUserMenu();
-        std::cin >> userChoice;
-        std::cin.ignore();
+        std::cin >> userChoice;        
         try {
-			userChoiceInt = std::stoi(std::to_string(userChoice));
+			userChoiceInt = std::stoi(userChoice);
             }
         catch (const std::exception& e) {
             std::cout << "Invalid input! Please enter a valid choice.\n";
 			continue;
         }
-        switch (userChoice) {
+        switch (userChoiceInt) {
         case 1:
             system.showEvents();
             break;
         case 2: {
             int eid; double price;
             std::cout << "Enter event ID: "; std::cin >> eid;
-            std::cout << "Enter ticket price: "; std::cin >> price;
-            std::cin.ignore();
+            std::cout << "Enter ticket price: "; std::cin >> price;           
             system.bookTicket(currentUser, eid, price);
             break;
         }
         case 3: {
             int tid;
-            std::cout << "Enter ticket ID: "; std::cin >> tid;
-            std::cin.ignore();
+            std::cout << "Enter ticket ID: "; std::cin >> tid;           
             system.cancelTicket(currentUser, tid);
             break;
         }
@@ -104,8 +99,7 @@ void choiceManagerMenu(BookingSystem& system) {
         std::string managerChoice;
         int managerChoiceInt;
         showManagerMenu();
-        std::cin >> managerChoice;
-        std::cin.ignore();
+        std::cin >> managerChoice;        
         try {
             managerChoiceInt = std::stoi(managerChoice);
         }
@@ -181,9 +175,9 @@ void choiceManagerMenu(BookingSystem& system) {
 void choiceMainMenu(BookingSystem& system) {
     while (true) {
         std::string choice;
+        int choiceInt;
         showMainMenu();
-        std::cin >> choice;
-		int choiceInt;
+        std::cin >> choice;	
 		try {
 			choiceInt = std::stoi(choice);
 		}
@@ -214,4 +208,3 @@ int main() {
     system.saveToJson("data.json");
     return 0;
 }
-

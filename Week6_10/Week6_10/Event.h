@@ -9,8 +9,7 @@ struct Event {
 	bool status;
 
 	Event(int id = 0, const std::string& name = "", const std::string& dateStr = "", const std::string& loc = "", bool stat = true)
-		: eventId(id), eventName(name), date(dateStr), location(loc), status(stat) {
-	}
+		: eventId(id), eventName(name), date(dateStr), location(loc), status(stat) {}
 
 	int getEventId() const { return eventId; }
 	const std::string& getEventName() const { return eventName; }

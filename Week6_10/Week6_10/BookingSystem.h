@@ -4,7 +4,6 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <set>
 #include <algorithm> 
 #include "User.h"
 #include "Event.h"
@@ -39,7 +38,6 @@ public:
     void addEvent(const std::string& name, const std::string& date, const std::string& loc);
 
     void updateEvent(int id);
-
 
     void removeEvent(int id);
 

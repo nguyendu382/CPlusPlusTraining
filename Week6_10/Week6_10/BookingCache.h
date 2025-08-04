@@ -7,6 +7,7 @@ class BookingCache {
 
 public:
 	BookingCache(size_t size = 10) : maxSize(size) {}
+
     void addBooking(int bookingId) {
         if (recentBookings.size() >= maxSize) {
 			recentBookings.pop_front();
